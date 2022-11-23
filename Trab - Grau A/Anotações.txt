@@ -1,0 +1,308 @@
+static const char* VertexShaderSource =
+"#version 430 core\n"
+"uniform mat4 projection;"
+"layout(location = 0) in vec2 coord;\n"
+"layout(location = 1) in vec4 color;\n"
+"layout(location = 2) in vec3 tex;\n"
+"out vec4 oColor;\n"
+"out vec3 oTex;\n"
+"void main(){\n"
+"	gl_Position.xy = coord;\n"
+"	gl_Position.z = 0;\n"
+"	gl_Position.w = 1;\n"
+"   gl_Position = projection * gl_Position;\n"
+"   oColor = color;\n"
+"   oTex = tex;\n"
+"}";
+
+static const char* FragmentShaderSource =
+"#version 430 core\n"
+"uniform sampler2D texSamplers[10];\n"
+"in vec4 oColor;\n"
+"in vec3 oTex;\n"
+"out vec4 color;\n"
+"void main(){\n"
+"    if (oTex.x < 0) {\n"
+"	    color = oColor;\n"
+"    } else {\n"
+"       color = texture(texSamplers[int(oTex.z)], oTex.xy);\n"
+"    }\n"
+"}";
+
+https://github.com/FranDiass/Fran-PG2022-2
+
+Jogo criado na arquitetura de 64bits (x64)
+
+Estrutura Geral do Código
+O código está dividido em pastas, cada pasta abriga códigos com funcionalidades
+específicas:
+● Entities: Armazena o código de todas as entidades do jogo, as que interagem
+com o jogo em si: gato, rato, piso e os buracos na parede
+● Game: Armazena todas as classes relacionadas à lógica do jogo: Scene, classe
+base das entidades, propriedades das entidades, GUI, Texturas do jogo, limites
+do mundo, etc.
+● Graph: Armazena códigos relacionados à renderização: Render, Texturas, Font,
+carregamento de imagens, VertexArrays, etc.
+● Utility: Classes de utilidade, geração de números aleatórios, LoopFrame para
+calcular o tempo de cada frame e carregamento de fontes.
+
+A estrutura geral do código foi pensada para imitar até certo nível uma Engine
+de games, de forma que nós temos uma Scene que representa uma coleção de
+entidades, essas entidades podem ter qualquer tipo de comportamento, e também
+definir sprites que serão usados para renderizar elas na tela, elas são processadas e
+renderizadas pela Scene, cada entidade tem métodos para informá-la quando ela foi
+inserida nas Scene, quando foi removida e quando ela deve atualizar sua lógica para
+um novo frame.
+
+Cada entidade também tem propriedades úteis a cada uma: transformações
+geométricas, Sprite, propriedades físicas e alguns métodos úteis para setar sprites,
+ajuste de posição, etc.
+A scene também tem um atributo chamado GUI que é responsável por renderizar
+os menus do jogo, o menu do jogo deve implementar interação do usuário com botões,
+etc.
+
+Foi utilizado um padrão de criar classes estáticas(classe que possui apenas
+atributos estáticos), porque evita a dor de cabeça de ter que gerenciar e manter uma única instância da
+classe, e também de evitar a criação de mais de uma instância. Além disso, essa
+padrão permite que eu declare classes e variáveis dentro do arquivo .cpp, que só serão
+visíveis dentro desse arquivo. Ou seja, a lógica da classe fica bem abstraída de quem
+utiliza a classe.
+
+A função main é responsável por inicializar várias funcionalidades do jogo: Inicializar a
+OpenGL e criar a janela da aplicação(Graph/Window.hpp), gerador de números
+aleatórios, o render, carregar as texturas do game, criar a scene e configurar a
+GUI(Gerenciados dos menus) que será usada, criar a matriz de projeção que será
+usada pela classe Scene para renderizar os objetos do jogo.
+
+A função main também manterá o loop do jogo, calculando os intervalos entre cada
+frame(Classe Utility/LoopFrame.hpp), atualizando a lógica do game(classe
+Game/Scene.hpp) e fazendo a renderização(método render da classe Scene) e a troca
+de buffers da janela(glfwSwapBuffers).
+
+A função main também fará a finalização de todos os recursos do jogo, tudo que foi
+inicializado será finalizado após o loop do jogo.
+
+
+Classe Window(Graph/Window.hpp)
+Representa a janela da GLFW, também é responsável por inicializar a glfw, ela
+possui métodos para ler o estado dos dispositivos periféricos(mouse e teclado). Todos
+os métodos dessa classe são estáticos, esse é um padrão que está presente em várias
+classes do game.
+
+Classe Shader(Graph/Shader.hpp)
+Classe responsável por criar um glProgram, essa classe tem apenas um método
+que recebe como entrada o código dos shaders: vertex shader e fragment shader, cria
+os shaders, compila eles e em seguida linka eles em um glProgram, e por fim retorna o
+id do programa que a OpenGL criou.
+
+Classe Texture2D(Graph/Texture.cpp)
+Classe que representa uma Texture2D na OpenGL, o método estático Create
+carrega uma imagem utilizando a biblioteca STBImage.h e cria uma texture na
+OpenGL.
+
+
+Classe VertexArrays(Graph/VertexArrays.hpp)
+Essa classe cria e configura os buffers de dados na OpenGL: vertex buffer e o
+buffer de indices. O buffer de indices é usado para definir em qual ordem os vértices no
+vertex buffer serão enviados para a renderização.
+
+Depois de criar os buffers, essa classe também vai criar o Vertex Array Object e
+fazer a configuração dos atributos de vértices especificados nos parâmetros.
+Um VAO é usado para salvar a configuração dos atributos de vértices, toda vez
+que você fizer o bind dele, a configuração que foi feita nele será ativada, e a próxima
+chamada de desenho vai utilizar os atributos configurados pelo VAO.
+
+Classe MatrixStack(Graph/MatrixStack.hpp)
+Define uma pilha de transformações para serem aplicadas nas entidades do jogo
+
+Classe Render(Graph/Render.hpp)
+Uma classe com todos os métodos estáticos, a implementação no arquivo .cpp é
+responsável por criar os buffers de dados, os shaders e popular os buffers e enviar os
+dados para renderização.
+
+Classe Entity(Game/Entity.hpp)
+Representa uma entidade do jogo, todas as entidades devem herdar dessa
+classe, ela possui atributos e métodos que as entidades precisam: transformações
+geométricas, Sprite, física, etc.
+O método OnCreate é chamado toda vez que a entidade é adicionada ao jogo
+O método OnRemove é chamado toda vez que a entidade é removida do jogo
+O método OnUpdate é chamado a cada frame do jogo, para que a entidade possa atualizar sua lógica.
+
+Classe Transform(Game/EntityComponents.hpp)
+Representa uma transformação de uma entidade: posição, tamanho e rotação,
+possui um método para gerar uma matriz de transformação, esse método é chamado
+toda vez que uma entidade vai ser renderizada.
+
+
+Classe PhysicsHelper(Game/Physics.hpp)
+Essa classe possui métodos para ajudar na física do game, para testar colisão
+entre duas entidades e para atualizar sua posição baseado na sua velocidade
+
+Classe Scene(Game/Scene.hpp)
+Essa classe vai armazenar, processar e renderizar todas as entidades do jogo,
+assim como os menus, porém ela deve ser configurada, as entidades devem ser
+adicionadas e removidas, e a GUI deve ser setada também. O nome da classe faz uma
+analogia com a Scene do Unity(numa scene você configura vários objetos e permite
+que eles interajam entre si, com o player, etc.)
+O método Include adiciona uma entidade à scene
+O método SetCat adiciona uma entidade Cat à scene
+O método Clear remove todas as entidades do game
+O método SetGUI define qual classe vai renderizar os menus do jogo
+O método Process itera sobre todas as entidades do game, assim e chama o
+método OnProcess delas, para que elas atualizem sua lógica. Esse método também
+adiciona/remove todas as entidades pendentes.
+Essa classe também possui um atributo chamado cat, esse atributo é um
+ponteiro para a entidade Gato do jogo(só tem um gato no jogo), isso facilita o acesso
+de outras partes do código à entidade gato.(o método SetCat é responsável por setar
+esse atributo)
+O método Render itera sobre todas as entidades do game, e renderiza o Sprite
+configurado nelas, caso tenha algum, além de renderizar a GUI do game.
+
+Classe Textures(Game/Textures.hpp)
+A classe textures carrega e armazena todas as texturas do game, as texturas
+podem ser acessadas através dos métodos: Get e GetTexture, que retornam
+respectivamente um Sprite e o id de uma textura. O mapeamento se dá pelo nome dos
+sprites/texturas, cada uma recebe um nome intuitivo: (CatHead, RatHead, WallHole,
+etc.)
+
+Classe UINode(Game/UINode.hpp)
+Representa um node de UI, tem apenas um método, que deve renderizar a UI
+do jogo.
+
+Classe GameGUI(Game/UINodes.hpp)
+Essa classe herda da classe UINode, ela renderiza os três menus do game:
+menu principal, menu do jogo em si e o menu de game over. Ela é responsável por
+identificar cliques do usuário e iniciar o game, renderizar o GUI do game(vida, pontos,
+etc) e também renderizar o menu de game over mostrando as estatísticas do game.
+Essa classe usa um switch para determinar o estado do jogo e o que deve ser
+renderizado na tela.
+Essa classe também faz a detecção de cliques na tela e determina se o clique
+aciona algum botão.
+
+O arquivo World.hpp nao tem classes, porém define os limites do mundo: onde
+fica o lado esquerdo, direito, cima, baixo, largura, altura, ratio do viewport(usado pela
+Window para ajustar o viewport), etc.
+
+Por fim as classes dentro da pasta Entities são as entidades do jogo:
+Gato: captura entradas do teclado e aplica a lógica do gato, andar para os lados
+e pulo, contabilizar pontos ganhos e vidas perdidas.
+
+Rato: Faz a lógica de um rato, movimentação, detecta colisão com o gato, e
+invoca os métodos do gato para adicionar/remover vida, dependendo se o rato
+fugiu(saiu da tela) ou foi capturado(colidiu com o gato).
+
+Floor: O floor representa o piso do game, ele determina a velocidade com que os
+buracos na parede devem spawnar os ratos, e também determina quando um novo
+burado deve ser criado.
+
+WallHole: o WallHole serve mais como um ponto de referência para spawnar os
+ratos.
+
+Classe Font(utility/Font.hpp)
+Essa calsse carrega uma font, uma fonte é composta por dois arquivos: um
+arquivo de imagem que contém todas os caracteres da fonte e um arquivo de texto que
+define as coordenadas para encontrar cada caractere dentro da imagem(coordenadas
+em pixels). A classe Font carrega uma fonte e cria estruturas para facilitar a
+renderização de fontes.
+
+Estrutura dos Buffers e Shaders
+Buffers
+Os buffers são criados dentro da função Initialize da classe Render, são criados
+dois buffers: Vertex buffer e o Index buffer.
+O vertex buffer vai armazenar os vértices que serão renderizados, cada vértice
+tem três atributos: coordenadas, cor e textura(mapeando de texturas).
+No arquivo Render.cpp é possível encontrar a configuração de cada
+atributo. A classe VertexArrays cria os buffers e configura os atributos de vértice na
+OpenGL. A configuração é feita pelo método CreateVertexArrays, que recebe um array
+de atributos para configurar na OpenGL, ele primeiro cria os buffers e salva seus ids,
+cria o VAO e salva seu id, por fim ele faz um loop no array de configurações e usa as
+funções glEnableVertexAttribArray para ativar o atributo de vértice na posição
+especificada(ver atributo layout no código do shader), e glVertexAttribPointer para
+especificar como a OpenGL deve ler o atributo de dentro do buffer de vértices.
+A ideia então é: criar um array de configurações, cada configuração especifica
+como um atributo deve ser lido do buffer de vértices, a classe VertexArrays
+simplesmente cria os buffers(vetex buffer, index buffer), o VAO e usa esse array de
+configurações para dizer a OpenGL como ler os atributos do vertex buffer. Essa leitura
+em si acontece na hora da renderização.
+
+Shaders
+Os shaders estão definidos no arquivo Render.cpp, o código deles está no topo
+do arquivo. O vertex shader recebe três atributos de vértice(coords, tex e color). Ele
+possui um uniform para definir a projeção. Ele executa a lógica de multiplicar a matriz
+de projeção pela coordenada, e simplesmente repassa a coordenada de textura e de
+cor para o fragment shader.
+O fragment shader tem um array de uniforms, esses uniform são samplers que
+recebem as texturas usadas, esse array permite até dez texturas. A lógica dele vai simplesmente decidir se
+deve colocar uma cor ou um mapeamento de textura no pixel, ele faz isso checando se
+a coordenada x da textura é menor do que 0, se for, ele renderiza a cor, caso contrário
+ele faz o mapeamento de textura.
+
+Renderização
+A renderização é feita no método EndRender, esse método vai ativar algumas
+configurações da OpenGL(blending, texturas 2D) e depois:
+● Faz o carregamento dos vértices que estão na memória para o vertex
+buffer e o index buffer.(usando a funcao glBufferSubData).
+● Faz o bind do VAO, usa o shader(glUseProgram)
+● Carrega os uniforms das texturas para o shader(LoadTextures)
+● Carrega o uniform da matrix de projeção
+● Por fim ele faz o bind do buffer de indices e invoca a chamada de
+desenho(glDrawElements), essa função vai utilizar um buffer de indices
+para enviar definir quais vértices de um vertex buffer devem ser enviados
+para a renderização.
+A classe Render possui um método para setar a matriz de projeção.
+Ela também possui um método para alterar a matriz de transformação(Que usa
+a pilha de transformcões).
+Ela possui três métodos de desenho, esses métodos são os responsáveis por
+preencher os array de vértices que serão posteriormente enviados ao VertexBuffer e ao
+IndexBuffer para renderização(no método EndRender).
+Exemplo, o método DrawRect recebe as coordenadas e dimensóes de um
+retangulo, e duas cores possíveis para pintar o retangulo, esse método vai adicionar 4
+vértices no array de triangulos, e depois adiciona 6 indices no array de indices, esses
+indices especificam a ordem em que esses quatro vertices devem ser desenhados.
+
+ordem:
+Array de indices: [..., IV1, IV2, IV3, IV3, IV4, IV1 ,…], sendo que os índices IV1, IV2 e
+IV3 vão mapear nos vértices equivalentes: V1, V2 e V3 formando um triângulo, a
+mesma lógica se aplica no outro triângulo.
+Esse array de índices é enviado para a renderização, e ele determina a ordem em que
+os vértices são enviados aos shaders.
+
+Gerenciamento de sprites
+Toda textura do jogo é armazenada em uma classe Texture2D(arquivo
+Graph/Texture.hpp), essa classe armazena o id da textura, e também a largura e altura
+da imagem usada para criar a textura.
+A classe Textures(arquivo Game/Textures.hpp) Carrega todas as texturas utilizadas no
+jogo, ele também cria todos os Sprites do jogo(os sprites têm suporte para animação,
+apesar do jogo não estar utilizando nenhuma animação).
+As texturas do jogo são colocadas em um mapa(std::map), esse mapa associa nomes
+intuitivos(char*) aos objetos da classe Texture2D, por exemplo o nome CatHead pode
+ser usado para encontrar a textura da cabeça do gato, o nome Floor para encontrar a
+textura do piso, etc.
+Os sprites também são colocados em um mapa.
+Texturas e sprites podem ser retornados pelos métodos Get e GetTexture, que recebem
+o nome da texture/sprite e vao popular os dados do sprite/textura no segundo
+parâmetro da função.
+
+Controle de personagem
+O personagem é controlado com as teclas: seta para esquerda, seta para direita
+e seta para cima. Dentro do método OnProcess da entidade gato(arquivo
+Entities/Cat.cpp) você verá no topo da função chamadas à classe
+Window(Graph/Window.hpp) para determinar se essas teclas estão pressionadas,
+dependendo do estado delas, e lógica de movimentação e pulo do gato serão
+aplicadas.
+As colisões são verificadas a cada frame, cada entidade Rato(Entities/Rat.hpp)
+testa em cada frame se está colidindo com o gato, é verificado a posição de cada
+entidade(exemplo: cat->transform.position.x acessa a posição x do gato) e também as
+dimensões de cada entidade para testar se estão colidindo(isso é feito no arquivo
+Game/Physics.cpp).
+A movimentaçao dos objetos é feita de forma simples, eles definem uma velocidade de
+movimento, e a posição é calculada em cada frame assim:
+Transform.position.x += velocidade * ds; ds é um valor informando quantos segundos
+se passaram no último frame. A velocidade é definida por cada entidade.
+Os ratos possuem uma lógica adicional de se espalharem no cenário, para isso eles
+geram duas posicóes aleatoria sno cenario, e caminham em linha reta ate essas
+posicoes, fazendo um L.
+O gato possui uma lógica de pulo, onde você pressiona a seta para cima por algum
+tempo, e quando soltar a tecla o gato dá um pulo, o tamanho do pulo depende de
+quanto tempo você segurar a tecla, além disso, enquanto segura o pulo o gato fica
+mais lento.

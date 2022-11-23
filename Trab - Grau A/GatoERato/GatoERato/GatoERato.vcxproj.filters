@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Arquivos de Origem">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Arquivos de Cabeçalho">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Arquivos de Recurso">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Arquivos de Cabeçalho\Graph">
+      <UniqueIdentifier>{f81ac33e-da7f-40f2-9454-21f98959be47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Arquivos de Origem\Graph">
+      <UniqueIdentifier>{b1e668d3-481f-4be6-9d98-133f6e0b2827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Arquivos de Cabeçalho\Game">
+      <UniqueIdentifier>{98aeca89-02ef-442b-83f5-cd3f29e5fd55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Arquivos de Origem\Game">
+      <UniqueIdentifier>{e74e35be-ef1e-4264-8368-7f2d350c4fa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Arquivos de Cabeçalho\Entities">
+      <UniqueIdentifier>{6d22b916-b6bc-4988-8b9a-fda287d09e81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Arquivos de Origem\Entities">
+      <UniqueIdentifier>{2b2cd111-8940-4fc0-b6c1-99bab0a88d1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Arquivos de Cabeçalho\Utility">
+      <UniqueIdentifier>{48123c16-775b-4c9f-a441-ed635db3081e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Arquivos de Origem\Utility">
+      <UniqueIdentifier>{eba90ef7-0267-4e1e-bd02-1fcbfb283b09}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="glad\src\glad.c">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
+    <ClCompile Include="Render.cpp">
+      <Filter>Arquivos de Origem\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Arquivos de Origem\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Arquivos de Origem\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="Textures.cpp">
+      <Filter>Arquivos de Origem\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Arquivos de Origem\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Cat.cpp">
+      <Filter>Arquivos de Origem\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>Arquivos de Origem\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Arquivos de Origem\Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="Rat.cpp">
+      <Filter>Arquivos de Origem\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Random.cpp">
+      <Filter>Arquivos de Origem\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Floor.cpp">
+      <Filter>Arquivos de Origem\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="WallHole.cpp">
+      <Filter>Arquivos de Origem\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics.cpp">
+      <Filter>Arquivos de Origem\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="UINodes.cpp">
+      <Filter>Arquivos de Origem\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Arquivos de Origem\Utility</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Render.hpp">
+      <Filter>Arquivos de Cabeçalho\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.hpp">
+      <Filter>Arquivos de Cabeçalho\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixStack.hpp">
+      <Filter>Arquivos de Cabeçalho\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.hpp">
+      <Filter>Arquivos de Cabeçalho\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexArrays.hpp">
+      <Filter>Arquivos de Cabeçalho\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureRegion.hpp">
+      <Filter>Arquivos de Cabeçalho\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="STBImage.h">
+      <Filter>Arquivos de Cabeçalho\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.hpp">
+      <Filter>Arquivos de Cabeçalho\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityComponents.hpp">
+      <Filter>Arquivos de Cabeçalho\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Textures.hpp">
+      <Filter>Arquivos de Cabeçalho\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.hpp">
+      <Filter>Arquivos de Cabeçalho\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Cat.hpp">
+      <Filter>Arquivos de Cabeçalho\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.hpp">
+      <Filter>Arquivos de Cabeçalho\Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="Rat.hpp">
+      <Filter>Arquivos de Cabeçalho\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="World.hpp">
+      <Filter>Arquivos de Cabeçalho\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Floor.hpp">
+      <Filter>Arquivos de Cabeçalho\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="WallHole.hpp">
+      <Filter>Arquivos de Cabeçalho\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.hpp">
+      <Filter>Arquivos de Cabeçalho\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="UINode.hpp">
+      <Filter>Arquivos de Cabeçalho\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="UINodes.hpp">
+      <Filter>Arquivos de Cabeçalho\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="LoopFrame.hpp">
+      <Filter>Arquivos de Cabeçalho\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.hpp">
+      <Filter>Arquivos de Cabeçalho\Utility</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Random.hpp">
+      <Filter>Arquivos de Cabeçalho\Utility</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,145 @@
+https://github.com/FranDiass/Fran-PG2022-2
+Jogo criado na arquitetura de 64bits (x64)
+
+Versão:
+static const char* VertexShaderSource =
+"#version 430 core\n"
+"uniform mat4 projection;"
+"layout(location = 0) in vec2 coord;\n"
+"layout(location = 1) in vec4 color;\n"
+"layout(location = 2) in vec3 tex;\n"
+"out vec4 oColor;\n"
+"out vec3 oTex;\n"
+"void main(){\n"
+"	gl_Position.xy = coord;\n"
+"	gl_Position.z = 0;\n"
+"	gl_Position.w = 1;\n"
+"   gl_Position = projection * gl_Position;\n"
+"   oColor = color;\n"
+"   oTex = tex;\n"
+"}";
+
+static const char* FragmentShaderSource =
+"#version 430 core\n"
+"uniform sampler2D texSamplers[10];\n"
+"in vec4 oColor;\n"
+"in vec3 oTex;\n"
+"out vec4 color;\n"
+"void main(){\n"
+"    if (oTex.x < 0) {\n"
+"	    color = oColor;\n"
+"    } else {\n"
+"       color = texture(texSamplers[int(oTex.z)], oTex.xy);\n"
+"    }\n"
+"}";
+
+Instruções de desenvolvimento
+
+• Correta criação e utilização dos buffers
+o VAO, VBO(s) e EBO (este último é opcional)
+• Correta utilização das transformações de câmera e nos objetos
+
+o Como está mapeada a matriz de projeção ortográfica 2D?
+----- Foi utilizado o arquivo "Arquivos de Cabeçalho --> Graph --> Render.hpp"
+onde foi setado a matrix de projeção da matriz de 4x4, e está sendo setado través da main.cpp
+gameScene.projection = glm::ortho(WORLD_LEFT, WORLD_RIGHT, WORLD_BOTTOM, WORLD_TOP);
+O tamanho ficou setado pelo arquivo "Arquivos de Cabeçalho --> Game --> World.hpp"
+WORLD_WIDTH(20.0f)
+WORLD_HEIGHT(30.0f)
+
+Primeiro seta a projeção do mundo, depois carrega as cenas (scenes), depois carrega os objetos.
+
+----------------------------------------------------------------------------------
+o Como são feitas e atualizadas as transformações nos objetos da cena?
+---Arquivo "Arquivos de Origem --> Game -->  Scene.cpp"
+Efetua a renderização de todas as entidades
+
+Desenha todas as entidades do jogo, os ratos, gato, os buracos e o chão
+
+Tem comandos para efetuar o flip da troca de lado do gato de acordo com a sua velocidade
+----
+----------------------------------------------------------------------------------
+• Sprites como textura mapeadas em polígonos, para o desenho de:
+--SEM ANIMAÇÃO CONFIGURADA
+----------------------------------------------------------------------------------
+o personagem, objetos e itens
+o imagens de fundo
+o As imagens podem ser obtidas da internet ou elaboradas pelos alunos
+----MOSTRAR
+----------------------------------------------------------------------------------
+• Controle da movimentação personagem 2D (com input de teclado e/ou mouse)
+---CONTROLE É FEITO SOMENTE NO GATO, ATRAVÉS DAS TECLAS DIRECIONAIS.
+Cat.cpp
+foi utilizado como referência a GLFW para ver o estado da tecla, se está "press", pressionada, 
+A função da velocidade é dentro da physics
+foi criado uma lógica de jump para verificar quanto tempo de carregamento ficou pressionado o botão de pulo "seta para cima", e então, faz o cálculo enquanto a tecla fica pressionada, pegando a velocidade.
+ficou limitado o tamanho do pulo com o pulo com tamanho da tela, 0,2f
+quanto mais ratos matar, mais lento fica.
+3 níveis de velocidade.
+Foi incluída uma função para demilitar o movimento do gato dentro do cenário.
+Sendo o limite esquerdo -20% do tamanho e do direito, seria +20%
+posição inicial sendo como 2 em referência a base da tela.
+
+----------------------------------------------------------------------------------
+• Colisão entre sprites (coletar itens, tiros etc, conforme a proposta do jogo)
+Requisitos extras (adicionam até +1.0 pto à nota do Trabalho):
+• Sprites com animação
+---sem sprites de animação
+----------------------------------------------------------------------------------
+• Cenário formado por camadas, para implementação do efeito de “parallax scrolling
+---sem efeito parallax
+----------------------------------------------------------------------------------
+• HUDs (Head-Up Displays)1 com texto (usando, por exemplo, a FreeType)
+---arquivo UINodes.cpp responsável pela renderização de itens nas telas de MainMenu, Playing e GameOver.
+Foi realizado controle do click do mouse para a posição do "play" na tela inicial e do "Continue"  na tela de gameover
+Para texto de play, utilizado comando
+DrawString
+DrawReact renderizar e manipular a cor da barra de pulo
+E Textures::Get("CatHead", sprite); para pegar a imagem da cabeça do gato para significar a vida do gato na tela.
+
+----------------------------------------------------------------------------------
+• Telas de entrada, de jogo e gameover
+---Tela de Mainmenu, tela de playing e tela de gameover.
+----------------------------------------------------------------------------------
+• Som (SDL mixer, OpenAL, FMOD etc)
+--não implementado.
+----------------------------------------------------------------------------------
+É recomendado que o jogo tenha um arquivo de configuração, para carregar imagens das camadas e demais configurações necessárias.
+---CARREGAMENTO DE IMAGENS PELOS ARQUIVOS:
+Textures.hpp, Texture.hpp e Texture.cpp
+----------------------------------------------------------------------------------
+o Estrutura geral do código (classes e/ou funções)
+---
+arquivos de cabeçalho --> pasta --> nome arquivo.hpp
+Arquivos de origem --> pasta --> nome arquivo.cpp
+e dependeências externas.
+----------------------------------------------------------------------------------
+o Estrutura dos buffers e shader(s) (como você especificou os vértices e seus 
+atributos e como você os envia para os shaders)
+--ver doc
+----------------------------------------------------------------------------------
+o Gerenciamento dos sprites: como são armazenadas as informações das transformações, ID de texturas, infos adicionais
+--ver doc
+----------------------------------------------------------------------------------
+o Como é feito o controle do personagem (teclado e/ou mouse)
+---pela GLFW, setado na lógica de pulo e movimentação do gato, somente através das setas da left, right e up.
+----------------------------------------------------------------------------------
+o Como são verificadas as colisões
+--- controle de colisões é realizada no arquivo Physics.cpp q verifica a entidade a e a entidade b, no caso, do gato e o rato. caso estejam na mesma posição, há a colisão, teste de colisões é realizada pelos ratos vs o gato e com o cenário.
+arquivo Rat.cpp
+Caso rato capiturado, aumenta contador de rato capturado e retira ele do cenário.
+Caso do rato chegar ao final do cenário, o rato escapa e retira ele do cenário.
+
+--ver vídeo.
+----------------------------------------------------------------------------------
+o Como é feita a movimentação de outros objetos do cenário (se houver)
+
+----------------------------------------------------------------------------------
+o Como é gerenciada a animação dos sprites (se houver)
+--não há
+----------------------------------------------------------------------------------
+o Como são gerenciadas as camadas para o efeito de Parallax (se houver)
+--não há 
+----------------------------------------------------------------------------------
+1 HUDs são elementos gráficos exibidos na tela para transmitir informações ao jogador (como pontuação, vidas etc).
+

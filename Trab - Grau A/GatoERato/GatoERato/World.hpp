@@ -1,0 +1,13 @@
+#pragma once
+
+#define WORLD_WIDTH (20.0f)
+#define WORLD_HEIGHT (30.0f)
+
+#define WORLD_LEFT (0.0f)
+#define WORLD_BOTTOM (0.0f)
+#define WORLD_RIGHT WORLD_WIDTH
+#define WORLD_TOP WORLD_HEIGHT
+
+#define WORLD_CENTER_Y ((WORLD_TOP - WORLD_BOTTOM) / 2.0f)
+
+#define WORLD_RATIO (WORLD_WIDTH / WORLD_HEIGHT)
