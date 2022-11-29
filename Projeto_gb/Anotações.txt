@@ -1,0 +1,38 @@
+Carregamento da imagem principal:
+Ao iniciar, o programa pede ao usuário, no console, que informe o caminho de uma imagem para ser carregada, o programa vai manter o usuário nessa pergunta até que ele informe uma imagem válida maior do que 32x32 pixels. Imagens com transparência serão convertidas para imagens sem transparência com fundo branco. Depois de carregar a imagem selecionada pelo usuário, a imagem será redimensionada, mantendo as proporções, para caber na tela do programa, o programa cria um preview(uma imagem menor usada para aplicar os filtros e permitir uma pré visualização dos filtros na imagem original). Além do preview também é feita uma cópia da imagem original, essa cópia é a que sera desenhada na tela, e onde os filtros serão aplicados, a imagem original é mantida para permitir a restauração da imagem.
+
+Stickers:
+Depois de carregar e fazer o processamento inicial da imagem do usuário, o programa vai carregar os stickers, como os stickers possuem fundo transparente, o programa vai extrair a camada de transparência dos stickers e usar ela como uma máscara na hora de renderizar o sticker. Os stickers possuem uma imagem icone, em tamanho menor, usada para que o usuário possa selecionar o sticker, e a imagem original que é renderizada quando o usuário está posicionando o sticker na tela.
+
+A seleção dos stickers acontece dentro da função mouseCb na linha 196, essa função captura o estado do mouse e salva as informações necessárias para detectarmos cliques e arrastos.
+
+Quando o icone de um sticker for clicado, ele será selecionado(linha 291), o membro stickerIdx será setado para indicar qual sticker está selecionado, se o usuário começar a mover o mouse, então o sticker está sendo arrastado, nesse momento a imagem original do sticker começa a ser desenhada na tela, na mesma posição em que o mouse está, também é feito um calculo para não permitir que o sticker seja posicionado fora da tela(A funcão DrawDrag é usada para renderizar o sticker sendo arrastado, linha 495).
+
+Caso o usuário arraste o mouse para cima da imagem principal, e solte o sticker em cima dela, o programa adiciona o id do sticker na lista de stickers que estão posicionados na imagem e salva a posição em que foi solto(linha 222). A função DrawImage(linha 395) é responsável por desenhar a imagem principal, e também desenha os stickers que estão na imagem(na linha 424).
+
+Também é possível selecionar um sticker que já esteja posicionado na imagem, ao clicar sobre ele, o clique é identificado na linha 299, se um sticker que já está posicionado for clicado, ele será marcado um retângulo vermelho, para indicar a seleção para o usuário. Se o usuário mover o mouse enquanto seleciona uma sticker que já está posicionado na imagem, o sticker terá sua posição atualizada para ser igual a posição do mouse(linha 280).
+
+Se o usuário arrastar um sticker que já está posicionado na imagem para fora dela ele será removido da lista de stickers na imagem(linha 235). Da mesma forma, se o usuário selecionar um novo sticker para colocar na imagem, e soltá-lo fora dela, o sticker não será adicionado à lista de stickers na imagem(linha 220 verifica essa lógica).
+
+Filtros:
+Os filtros são funções que serão aplicadas na imagem e também no preview da imagem, para filtro salvamos uma imagem preview, que é o filtro sendo aplicado no preview da imagem principal, sua posição na tela, para que o usuário possa selecionar e um ponteiro para uma função que será chamada quando for selecionado(linha 63). 
+No início do programa, os filtros são criados(671), indicando apenas a função callback que deve ser usada para aplicar o filtro. Todas as funções de filtros podem ser encontradas a partir da linha 127, todas elas possuem os mesmos parâmetros: uma imagem de entrada e outra de saída(imagem editada). A função DrawFilters(linha 380) renderiza os previews dos filtros logo abaixo da imagem principal, ela também aplica o filtro no preview(função callback do filtro), caso o preview do filtro não exista ainda. Quando o usuário realiza um clique sobre o filtro, o filtro é aplicado na imagem sendo mostrada na tela(linha 258).
+Se algum filtro for aplicado na imagem, o botão "Reset Filtros" vai estar disponível para que o usuário recupere a imagem original(linha 512).
+
+Video:
+Quando o botão de captura de vídeo for clicado, um objeto VideoCapture será instanciado para realizar a captura de vídeo(linha 103).
+Dentro da função DrawImage(linha 395) é escolhida a imagem para ser desenhada na tela, caso esteja ocorrendo a captura de vídeo, a imagem renderizada será a imagem capturada pela webcam, caso contrário, a imagem original será desenhada(linha 402).
+Quando o usuário clicar no botão Capturar, o frame atual da webcam será capturado, a captura de vídeo será interrompida e a imagem original será setada para ser igual à imagem capturada, o preview da imagem também será alterado(linha 108).
+
+Salvamento:
+Quando o usuário clicar no botão "Salvar" a função DrawImageFinal será chamada para salvar a imagem no arquivo output.jpg(linha 449). Essa função irá renderizar a imagem editada(com ou sem filtro aplicado), ela também vai calcular as dimensões da imagem de saída, porque alguns stickers podem ser posicionados parcialmente fora da imagem, nesse caso alterando as dimensões da imagem(linha 457). Por fim, um canvas é criado, onde a imagem final será renderizada, nele são renderizados a imagem editada, e os stickers(linha 479 e linha 482), na linha 491 a função imwrite é chamada para criar a imagem de saída.
+
+Botões:
+Os botoes sao necessários para permitir que o usuário tome ações dentro do programa, todos os botões são criados na linha (638). Cada botão tem um id, para identifica-lo quando for clicado, um texto que será mostrado, uma cor, um retangulo que determina suas dimensoes e
+uma funcao callback para ser invocada quando ele for clicado(pode ser null, botão está definido na linha 40). A funçao DrawButtons(linha 334) renderiza os botões, ela adiciona uma borda mais escura no botão, e também altera a cor dele caso esteja sendo pressionado pelo
+usuário(linha 341). O texto do botão é renderizado e centralizado dentro do botão. Na linha 366 a função ainda detecta qual botão foi clicado no frame atual e invoca sua função callback. Na linha 211 é detectado quando algum botão foi pressionado. Na linha 248 é detectado quando um botão que está pressionado foi clicado.
+
+Detecção de olhos
+A detecção de olhos é feita na função DetectEyes(Linha 140), a função primeiro detecta um rosto na imagem(linha 145), e caso haja algum, logo em seguida ela detecta os olhos na região em que o rosto foi encontrado(linha 158). Caso um olho seja detectado, o sticker do silios esquerdo será desenhado na tela, caso o olho direito seja detectado também, o cílios do olho esquerdo será desenhado.
+
+Para a detecção de rostos e olhos é usada a classe CascadeClassifier da OpenCV, que utiliza Machine Learning, são necessários dois arquivos XML fornecidos pela própria opencv, para treinar o algoritmo para fazer a detecção de rostos e olhos.
